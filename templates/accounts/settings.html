@@ -1,0 +1,32 @@
+{% extends "accounts/_dashboard_base.html" %}
+{% block title %}Settings — {{ SITE_NAME }}{% endblock %}
+{% block dashboard_content %}
+<h2 class="mb-4">Settings</h2>
+<div class="glass p-4">
+  <h5 class="mb-3">Profile</h5>
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label small text-muted">Headline</label>
+        {{ form.headline }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small text-muted">Avatar URL</label>
+        {{ form.avatar_url }}
+      </div>
+      <div class="col-12">
+        <label class="form-label small text-muted">Bio</label>
+        {{ form.bio }}
+      </div>
+    </div>
+    <button type="submit" class="btn-ciq-primary mt-4">Save Changes</button>
+  </form>
+</div>
+
+<div class="glass p-4 mt-4">
+  <h5 class="mb-3">Account</h5>
+  <p class="text-muted small mb-1"><strong>Email:</strong> {{ user.email }}</p>
+  <p class="text-muted small mb-0"><strong>Signed in with:</strong> Google</p>
+</div>
+{% endblock %}

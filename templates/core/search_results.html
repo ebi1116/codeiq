@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load technology_logos %}
+{% block title %}Search results for "{{ query }}" — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="container py-5">
+  <div class="mb-4" data-aos="fade-up">
+    <span class="section-eyebrow">Search</span>
+    <h1 class="section-title">Results for "{{ query }}"</h1>
+    <p class="text-muted">{{ paginator.count }} PDF{{ paginator.count|pluralize }} found</p>
+  </div>
+
+  <form method="get" class="search-shell mb-4" data-aos="fade-up">
+    <i class="fa-solid fa-magnifying-glass text-muted"></i>
+    <input type="text" name="q" value="{{ query }}" placeholder="Search Django, Amazon, React, HR questions...">
+    <button type="submit" class="btn-ciq-primary">Search</button>
+  </form>
+
+  {% if category_results or technology_results %}
+  <div class="row g-3 mb-5">
+    {% for category in category_results %}
+    <div class="col-6 col-md-3 col-lg-2">
+      <a href="{{ category.get_absolute_url }}" class="category-chip text-decoration-none d-flex h-100">
+        <i class="fa-solid {{ category.icon|default:'fa-layer-group' }}"></i>
+        <span>{{ category.name }}</span>
+      </a>
+    </div>
+    {% endfor %}
+    {% for technology in technology_results %}
+    {% technology_logo technology.name as default_logo %}
+    <div class="col-6 col-md-3 col-lg-2">
+      <a href="{{ technology.get_absolute_url }}" class="category-chip text-decoration-none d-flex h-100">
+        {% if technology.logo %}
+        <span class="technology-logo-frame"><img src="{{ technology.logo.url }}" alt="{{ technology.name }} logo" class="technology-logo"></span>
+        {% elif default_logo %}
+        <span class="technology-logo-frame"><img src="{{ default_logo }}" alt="{{ technology.name }} logo" class="technology-logo"></span>
+        {% else %}
+        <i class="fa-solid {{ technology.icon|default:'fa-microchip' }}"></i>
+        {% endif %}
+        <span>{{ technology.name }}</span>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    {% for pdf in results %}
+    <div class="col-6 col-md-4 col-lg-3">{% include "partials/pdf_card.html" %}</div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <i class="fa-solid fa-magnifying-glass fs-1 text-muted mb-3"></i>
+      <p class="text-muted">No PDFs matched your search. Try a different keyword.</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

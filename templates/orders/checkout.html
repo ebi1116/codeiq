@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Checkout — {{ pdf.title }} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="container py-5" style="max-width:560px;">
+  <div class="glass-strong p-4 p-md-5 text-center" data-aos="zoom-in">
+    <i class="fa-solid fa-lock fs-1 mb-3" style="color:var(--primary);"></i>
+    <h3 class="mb-2">Unlock "{{ pdf.title }}"</h3>
+    <p class="text-muted mb-4">You're about to purchase this PDF for lifetime access via secure Razorpay checkout.</p>
+
+    <div class="glass p-3 mb-4 d-flex justify-content-between align-items-center">
+      <span class="text-muted">Amount payable</span>
+      <span class="fs-4 fw-bold">₹{{ order.amount }}</span>
+    </div>
+
+    <button id="rzp-pay-btn" class="btn-ciq-primary w-100">
+      <i class="fa-solid fa-credit-card me-2"></i>Pay ₹{{ order.amount }} Securely
+    </button>
+    <a href="{{ pdf.get_absolute_url }}" class="btn-ciq-outline w-100 d-block text-center mt-3">Cancel</a>
+  </div>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById("rzp-pay-btn").addEventListener("click", function () {
+  const options = {
+    key: "{{ razorpay_key_id }}",
+    amount: "{{ amount_paise }}",
+    currency: "INR",
+    name: "{{ SITE_NAME }}",
+    description: "{{ pdf.title }}",
+    order_id: "{{ razorpay_order_id }}",
+    handler: function (response) {
+      fetch("{{ callback_url }}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || "",
+        },
+        body: new URLSearchParams(response),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "success") {
+            window.location.href = data.redirect_url;
+          } else {
+            alert("Payment verification failed. Please contact support.");
+          }
+        });
+    },
+    theme: { color: "#2563EB" },
+  };
+  const rzp = new Razorpay(options);
+  rzp.open();
+});
+</script>
+{% endblock %}

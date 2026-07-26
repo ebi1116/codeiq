@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ pdf.seo_title|default:pdf.title }} — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ pdf.seo_description|default:pdf.description|truncatewords:25 }}{% endblock %}
+{% block meta_keywords %}{{ pdf.seo_keywords }}{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row g-5">
+    <!-- LEFT: Banner + description -->
+    <div class="col-lg-8">
+      <nav aria-label="breadcrumb" data-aos="fade-up">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-muted">Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ pdf.category.get_absolute_url }}" class="text-muted">{{ pdf.category.name }}</a></li>
+          <li class="breadcrumb-item active text-muted">{{ pdf.title }}</li>
+        </ol>
+      </nav>
+
+      <div class="rounded-4 overflow-hidden mb-4" data-aos="fade-up" style="aspect-ratio:16/7;">
+        {% if pdf.banner %}
+          <img src="{{ pdf.banner.url }}" class="w-100 h-100" style="object-fit:cover;" alt="{{ pdf.title }}">
+        {% elif pdf.thumbnail %}
+          <img src="{{ pdf.thumbnail.url }}" class="w-100 h-100" style="object-fit:cover;" alt="{{ pdf.title }}">
+        {% endif %}
+      </div>
+
+      <h1 class="mb-3" data-aos="fade-up">{{ pdf.title }}</h1>
+
+      <div class="d-flex flex-wrap gap-3 mb-4 text-muted small" data-aos="fade-up">
+        <span><i class="fa-solid fa-layer-group me-1"></i>{{ pdf.category.name }}</span>
+        {% if pdf.technology %}<span><i class="fa-solid fa-microchip me-1"></i>{{ pdf.technology.name }}</span>{% endif %}
+        {% if pdf.company %}<span><i class="fa-solid fa-building me-1"></i>{{ pdf.company.name }}</span>{% endif %}
+        <span class="badge-difficulty-{{ pdf.difficulty }}"><i class="fa-solid fa-gauge-high me-1"></i>{{ pdf.get_difficulty_display }}</span>
+        <span><i class="fa-solid fa-user-tie me-1"></i>{{ pdf.get_experience_display }}</span>
+        <span><i class="fa-regular fa-file-lines me-1"></i>{{ pdf.pages }} pages</span>
+        <span><i class="fa-solid fa-language me-1"></i>{{ pdf.get_language_display }}</span>
+        <span><i class="fa-regular fa-calendar me-1"></i>Updated {{ pdf.updated_at|date:"M Y" }}</span>
+      </div>
+
+      <div class="glass p-4 mb-4" data-aos="fade-up">
+        <h5 class="mb-3">About this PDF</h5>
+        <p class="text-muted" style="white-space:pre-line;">{{ pdf.description }}</p>
+      </div>
+
+      {% if pdf.topics_list %}
+      <div class="glass p-4 mb-4" data-aos="fade-up">
+        <h5 class="mb-3">Topics Covered</h5>
+        <div class="row">
+          {% for topic in pdf.topics_list %}
+          <div class="col-md-6 mb-2"><i class="fa-solid fa-circle-check me-2" style="color:var(--accent);"></i>{{ topic }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- RIGHT: Purchase / download card -->
+    <div class="col-lg-4">
+      <div class="glass-strong p-4" style="position:sticky; top:100px;" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="fs-3 fw-bold">
+            {% if pdf.is_free %}Free{% else %}₹{{ pdf.price|floatformat:0 }}{% endif %}
+          </span>
+          {% if pdf.is_free %}
+            <span class="badge-price badge-free position-static">FREE</span>
+          {% else %}
+            <span class="badge-price badge-premium position-static">PREMIUM</span>
+          {% endif %}
+        </div>
+
+        {% if has_access %}
+          <a href="{% url 'pdfs:pdf_download' pdf.slug %}" class="btn-ciq-primary w-100 text-center d-block mb-2">
+            <i class="fa-solid fa-download me-2"></i>Download PDF
+          </a>
+        {% else %}
+          {% if pdf.is_free %}
+            {% if user.is_authenticated %}
+              <a href="{% url 'pdfs:pdf_download' pdf.slug %}" class="btn-ciq-primary w-100 text-center d-block mb-2">
+                <i class="fa-solid fa-download me-2"></i>Download Free
+              </a>
+            {% else %}
+              <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn-ciq-primary w-100 text-center d-block mb-2">
+                <i class="fa-brands fa-google me-2"></i>Sign in to Download
+              </a>
+            {% endif %}
+          {% else %}
+            {% if user.is_authenticated %}
+              <a href="{% url 'orders:create_order' pdf.slug %}" class="btn-ciq-primary w-100 text-center d-block mb-2">
+                <i class="fa-solid fa-lock me-2"></i>Purchase &amp; Unlock
+              </a>
+            {% else %}
+              <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn-ciq-primary w-100 text-center d-block mb-2">
+                <i class="fa-brands fa-google me-2"></i>Sign in to Purchase
+              </a>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+
+        {% if pdf.preview_pdf %}
+        <a href="{% url 'pdfs:pdf_preview' pdf.slug %}" target="_blank" class="btn-ciq-outline w-100 text-center d-block mb-3">
+          <i class="fa-solid fa-eye me-2"></i>Preview Sample
+        </a>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+        <div class="d-flex gap-2">
+          <button class="btn-ciq-outline flex-1 w-50" data-toggle-wishlist="{% url 'pdfs:toggle_wishlist' pdf.slug %}">
+            <i class="fa-{% if is_wishlisted %}solid{% else %}regular{% endif %} fa-heart me-1"></i>Wishlist
+          </button>
+          <button class="btn-ciq-outline flex-1 w-50" data-toggle-bookmark="{% url 'pdfs:toggle_bookmark' pdf.slug %}">
+            <i class="fa-{% if is_bookmarked %}solid{% else %}regular{% endif %} fa-bookmark me-1"></i>Save
+          </button>
+        </div>
+        {% endif %}
+
+        <hr class="divider-glow my-4">
+        <ul class="list-unstyled small text-muted d-flex flex-column gap-2 mb-0">
+          <li><i class="fa-solid fa-shield-halved me-2" style="color:var(--accent);"></i>Secure Razorpay checkout</li>
+          <li><i class="fa-solid fa-infinity me-2" style="color:var(--accent);"></i>Lifetime access after purchase</li>
+          <li><i class="fa-solid fa-eye me-2" style="color:var(--accent);"></i>{{ pdf.views_count }} views · {{ pdf.downloads_count }} downloads</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {% if related_pdfs %}
+  <div class="mt-5">
+    <h4 class="mb-4" data-aos="fade-up">Related PDFs</h4>
+    <div class="row g-4">
+      {% for pdf in related_pdfs %}
+      <div class="col-6 col-md-3">{% include "partials/pdf_card.html" %}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

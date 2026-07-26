@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ technology.seo_title|default:technology.name }} — {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ technology.seo_description|default:technology.description }}{% endblock %}
+{% block meta_keywords %}{{ technology.seo_keywords }}{% endblock %}
+{% block content %}
+<section class="container py-5">
+  <div class="mb-4" data-aos="fade-up">
+    <span class="section-eyebrow">Technology</span>
+    <h1 class="section-title">{{ technology.name }}</h1>
+    {% if technology.description %}<p class="text-muted mt-2">{{ technology.description }}</p>{% endif %}
+  </div>
+  {% regroup pdfs by get_content_type_display as content_groups %}
+  {% for group in content_groups %}
+  <section class="mb-5" aria-labelledby="content-type-{{ forloop.counter }}">
+    <h2 id="content-type-{{ forloop.counter }}" class="h3 mb-3">{{ group.grouper }}</h2>
+    <div class="row g-4">
+      {% for pdf in group.list %}
+      <div class="col-6 col-md-4 col-lg-3">{% include "partials/pdf_card.html" %}</div>
+      {% endfor %}
+    </div>
+  </section>
+  {% empty %}
+  <div class="text-center py-5">
+    <i class="fa-solid fa-folder-open fs-1 text-muted mb-3"></i>
+    <p class="text-muted">No content published for this technology yet.</p>
+  </div>
+  {% endfor %}
+  {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

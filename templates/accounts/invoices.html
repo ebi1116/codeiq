@@ -1,0 +1,31 @@
+{% extends "accounts/_dashboard_base.html" %}
+{% block title %}Invoices — {{ SITE_NAME }}{% endblock %}
+{% block dashboard_content %}
+<h2 class="mb-4">Invoices</h2>
+<div class="glass p-4">
+  {% if orders %}
+  <div class="table-responsive">
+    <table class="table table-borderless align-middle mb-0">
+      <thead class="text-muted small"><tr><th>Invoice #</th><th>PDF</th><th>Amount</th><th>Date</th><th></th></tr></thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.invoice_number }}</td>
+          <td>{{ order.pdf.title }}</td>
+          <td>₹{{ order.amount }}</td>
+          <td class="text-muted small">{{ order.paid_at|date:"M d, Y" }}</td>
+          <td><a href="{% url 'orders:invoice_detail' order.invoice_number %}" class="btn-ciq-outline btn-sm">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="fa-solid fa-file-invoice fs-1 text-muted mb-3"></i>
+    <p class="text-muted mb-0">No invoices yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

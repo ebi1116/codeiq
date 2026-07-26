@@ -1,0 +1,74 @@
+{% extends "accounts/_dashboard_base.html" %}
+{% block title %}Dashboard — {{ SITE_NAME }}{% endblock %}
+{% block dashboard_content %}
+<h2 class="mb-4">Welcome back, {{ user.first_name|default:user.username }} 👋</h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="dash-stat-card glass">
+      <i class="fa-solid fa-bag-shopping mb-2" style="color:var(--primary);"></i>
+      <div class="fs-4 fw-bold">{{ purchased_count }}</div>
+      <div class="text-muted small">Purchased PDFs</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="dash-stat-card glass">
+      <i class="fa-solid fa-gift mb-2" style="color:var(--accent);"></i>
+      <div class="fs-4 fw-bold">{{ free_downloads_count }}</div>
+      <div class="text-muted small">Free Downloads</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="dash-stat-card glass">
+      <i class="fa-solid fa-heart mb-2" style="color:#EC4899;"></i>
+      <div class="fs-4 fw-bold">{{ wishlist_count }}</div>
+      <div class="text-muted small">Wishlist Items</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="dash-stat-card glass">
+      <i class="fa-solid fa-bookmark mb-2" style="color:var(--secondary);"></i>
+      <div class="fs-4 fw-bold">{{ bookmarks_count }}</div>
+      <div class="text-muted small">Bookmarks</div>
+    </div>
+  </div>
+</div>
+
+<div class="glass p-4 mb-4">
+  <h5 class="mb-3">Recent Orders</h5>
+  {% if recent_orders %}
+  <div class="table-responsive">
+    <table class="table table-borderless align-middle mb-0">
+      <thead class="text-muted small"><tr><th>PDF</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody>
+        {% for order in recent_orders %}
+        <tr>
+          <td><a href="{{ order.pdf.get_absolute_url }}" class="text-reset">{{ order.pdf.title }}</a></td>
+          <td>₹{{ order.amount }}</td>
+          <td><span class="badge {% if order.status == 'paid' %}bg-success{% elif order.status == 'failed' %}bg-danger{% else %}bg-warning{% endif %}">{{ order.get_status_display }}</span></td>
+          <td class="text-muted small">{{ order.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-muted mb-0">No orders yet — browse premium PDFs to get started.</p>
+  {% endif %}
+</div>
+
+<div class="glass p-4">
+  <h5 class="mb-3">Recently Viewed</h5>
+  {% if recently_viewed %}
+  <div class="row g-3">
+    {% for rv in recently_viewed %}
+    <div class="col-6 col-md-4 col-lg-2">
+      {% with pdf=rv.pdf %}{% include "partials/pdf_card.html" %}{% endwith %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted mb-0">Nothing viewed yet — start exploring the library.</p>
+  {% endif %}
+</div>
+{% endblock %}

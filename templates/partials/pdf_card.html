@@ -1,0 +1,29 @@
+{% load static %}
+<div class="pdf-card" data-aos="fade-up">
+  <a href="{{ pdf.get_absolute_url }}" class="thumb-wrap d-block">
+    {% if pdf.thumbnail %}
+      <img src="{{ pdf.thumbnail.url }}" alt="{{ pdf.title }}" loading="lazy">
+    {% else %}
+      <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background:var(--bg-elevated);">
+        <i class="fa-solid fa-file-pdf fs-1 text-muted"></i>
+      </div>
+    {% endif %}
+    {% if pdf.is_free %}
+      <span class="badge-price badge-free">FREE</span>
+    {% else %}
+      <span class="badge-price badge-premium">₹{{ pdf.price|floatformat:0 }}</span>
+    {% endif %}
+  </a>
+  <div class="body">
+    <div class="meta">
+      <span><i class="fa-solid fa-layer-group me-1"></i>{{ pdf.category.name }}</span>
+      <span class="badge-difficulty-{{ pdf.difficulty }}"><i class="fa-solid fa-gauge-high me-1"></i>{{ pdf.get_difficulty_display }}</span>
+    </div>
+    <h3 class="title mb-0"><a href="{{ pdf.get_absolute_url }}">{{ pdf.title }}</a></h3>
+    <div class="meta mt-auto">
+      <span><i class="fa-regular fa-file-lines me-1"></i>{{ pdf.pages }} pages</span>
+      <span><i class="fa-solid fa-download me-1"></i>{{ pdf.downloads_count }}</span>
+      {% if pdf.company %}<span><i class="fa-solid fa-building me-1"></i>{{ pdf.company.name }}</span>{% endif %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load technology_logos %}
+{% block title %}{{ category.name }} Interview Questions PDF — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="container py-5">
+  <div class="mb-4" data-aos="fade-up">
+    <span class="section-eyebrow">Category</span>
+    <h1 class="section-title">{{ category.name }}</h1>
+    {% if category.description %}<p class="text-muted mt-2">{{ category.description }}</p>{% endif %}
+  </div>
+  {% if child_categories or technologies %}
+  <div class="row g-3 mb-5">
+    {% for child in child_categories %}
+    <div class="col-6 col-md-3 col-lg-2">
+      <a href="{{ child.get_absolute_url }}" class="category-chip text-decoration-none d-flex h-100">
+        <i class="fa-solid {{ child.icon|default:'fa-layer-group' }}"></i>
+        <span>{{ child.name }}</span>
+      </a>
+    </div>
+    {% endfor %}
+    {% for technology in technologies %}
+    {% technology_logo technology.name as default_logo %}
+    <div class="col-6 col-md-3 col-lg-2">
+      <a href="{{ technology.get_absolute_url }}" class="category-chip text-decoration-none d-flex h-100">
+        {% if technology.logo %}
+        <span class="technology-logo-frame"><img src="{{ technology.logo.url }}" alt="{{ technology.name }} logo" class="technology-logo"></span>
+        {% elif default_logo %}
+        <span class="technology-logo-frame"><img src="{{ default_logo }}" alt="{{ technology.name }} logo" class="technology-logo"></span>
+        {% else %}
+        <i class="fa-solid {{ technology.icon|default:'fa-microchip' }}"></i>
+        {% endif %}
+        <span>{{ technology.name }}</span>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

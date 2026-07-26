@@ -1,0 +1,19 @@
+{% extends "accounts/_dashboard_base.html" %}
+{% block title %}Wishlist — {{ SITE_NAME }}{% endblock %}
+{% block dashboard_content %}
+<h2 class="mb-4">Wishlist</h2>
+<div class="row g-4">
+  {% for item in items %}
+  <div class="col-6 col-md-4">
+    {% with pdf=item.pdf %}{% include "partials/pdf_card.html" %}{% endwith %}
+  </div>
+  {% empty %}
+  <div class="col-12 text-center py-5">
+    <i class="fa-solid fa-heart fs-1 text-muted mb-3"></i>
+    <p class="text-muted">Your wishlist is empty.</p>
+    <a href="{% url 'pdfs:pdf_list' %}" class="btn-ciq-primary">Browse PDFs</a>
+  </div>
+  {% endfor %}
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

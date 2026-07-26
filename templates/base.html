@@ -1,0 +1,202 @@
+{% load static socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}</title>
+<meta name="description" content="{% block meta_description %}Download curated interview question PDFs for top technologies and companies. Prepare smarter with {{ SITE_NAME }}.{% endblock %}">
+<meta name="keywords" content="{% block meta_keywords %}interview questions pdf, coding interview prep, django python java interview questions{% endblock %}">
+
+<!-- Open Graph -->
+<meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
+<meta property="og:description" content="{% block og_description %}Discover, preview and download interview question PDFs.{% endblock %}">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  (function () {
+    try {
+      var theme = localStorage.getItem("ciq-theme");
+      document.documentElement.setAttribute("data-theme", theme === "light" ? "light" : "dark");
+      var accent = localStorage.getItem("ciq-accent");
+      if (accent) document.documentElement.setAttribute("data-accent", accent);
+    } catch (error) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  }());
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<!-- ============ NAVBAR ============ -->
+<nav class="ciq-navbar py-3">
+  <div class="container d-flex align-items-center justify-content-between">
+    <a href="{% url 'core:home' %}" class="ciq-brand text-decoration-none">
+      <span class="dot"></span>
+      <span>Code<span class="text-gradient">IQ</span></span>
+    </a>
+
+    <div class="d-none d-lg-flex align-items-center gap-1">
+      <a href="{% url 'core:home' %}" class="ciq-nav-link">Home</a>
+      <a href="{% url 'pdfs:pdf_list' %}" class="ciq-nav-link">All PDFs</a>
+      <div class="dropdown">
+        <a class="ciq-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Categories</a>
+        <ul class="dropdown-menu ciq-dropdown border-0 shadow">
+          {% for cat in NAV_CATEGORIES %}
+          <li><a class="dropdown-item" href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <a href="{% url 'core:pricing' %}" class="ciq-nav-link">Pricing</a>
+      <a href="{% url 'core:faq' %}" class="ciq-nav-link">FAQ</a>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <div class="theme-settings-wrap">
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Open theme settings" aria-expanded="false" aria-controls="theme-panel">
+          <i class="fa-solid fa-gear" id="theme-icon"></i>
+        </button>
+        <div class="theme-panel" id="theme-panel" role="dialog" aria-label="Theme settings" hidden>
+          <div class="theme-panel-title">Appearance</div>
+          <div class="theme-panel-label">Theme</div>
+          <div class="theme-mode-options" role="group" aria-label="Color theme">
+            <button type="button" class="theme-mode-option" data-theme-option="light"><i class="fa-solid fa-sun"></i> Light</button>
+            <button type="button" class="theme-mode-option" data-theme-option="dark"><i class="fa-solid fa-moon"></i> Dark</button>
+          </div>
+          <div class="theme-panel-label">Accent color</div>
+          <div class="theme-accent-options" role="group" aria-label="Accent color">
+            <button type="button" class="theme-accent-option accent-blue" data-accent-option="blue" aria-label="Blue"></button>
+            <button type="button" class="theme-accent-option accent-violet" data-accent-option="violet" aria-label="Violet"></button>
+            <button type="button" class="theme-accent-option accent-emerald" data-accent-option="emerald" aria-label="Emerald"></button>
+            <button type="button" class="theme-accent-option accent-orange" data-accent-option="orange" aria-label="Orange"></button>
+            <button type="button" class="theme-accent-option accent-rose" data-accent-option="rose" aria-label="Rose"></button>
+            <button type="button" class="theme-accent-option accent-cyan" data-accent-option="cyan" aria-label="Cyan"></button>
+          </div>
+        </div>
+      </div>
+      {% if user.is_authenticated %}
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle" role="button" data-bs-toggle="dropdown">
+            <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:38px;height:38px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-weight:700;">
+              {{ user.first_name|default:user.username|first|upper }}
+            </span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end ciq-dropdown border-0 shadow">
+            <li><a class="dropdown-item" href="{% url 'accounts:dashboard' %}"><i class="fa-solid fa-gauge me-2"></i>Dashboard</a></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:purchases' %}"><i class="fa-solid fa-bag-shopping me-2"></i>Purchases</a></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:wishlist' %}"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
+            <li><a class="dropdown-item" href="{% url 'accounts:settings' %}"><i class="fa-solid fa-gear me-2"></i>Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'account_logout' %}"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      {% else %}
+        <a href="{% provider_login_url 'google' %}" class="btn-google">
+          <i class="fa-brands fa-google"></i> <span class="d-none d-md-inline">Continue with Google</span>
+        </a>
+      {% endif %}
+      <button class="btn border-0 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav">
+        <i class="fa-solid fa-bars fs-4"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile offcanvas nav -->
+<div class="offcanvas offcanvas-end glass-strong" tabindex="-1" id="mobileNav">
+  <div class="offcanvas-header">
+    <h5 class="ciq-brand">Code<span class="text-gradient">IQ</span></h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column gap-2">
+    <a href="{% url 'core:home' %}" class="ciq-nav-link">Home</a>
+    <a href="{% url 'pdfs:pdf_list' %}" class="ciq-nav-link">All PDFs</a>
+    <a href="{% url 'core:pricing' %}" class="ciq-nav-link">Pricing</a>
+    <a href="{% url 'core:faq' %}" class="ciq-nav-link">FAQ</a>
+    <a href="{% url 'core:about' %}" class="ciq-nav-link">About</a>
+    <a href="{% url 'core:contact' %}" class="ciq-nav-link">Contact</a>
+  </div>
+</div>
+
+{% if messages %}
+<div class="container mt-3">
+  {% for message in messages %}
+  <div class="alert glass border-0 alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ============ PAGE CONTENT ============ -->
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="ciq-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-6 col-md-3">
+        <a href="{% url 'core:home' %}" class="ciq-brand text-decoration-none d-inline-flex mb-3">
+          <span class="dot"></span><span>Code<span class="text-gradient">IQ</span></span>
+        </a>
+        <p class="text-muted small">{{ SITE_TAGLINE }}. Curated interview PDFs for developers, by developers.</p>
+        <div class="footer-social-icons mt-3">
+          <a href="#" class="social-icon"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <h6>Explore</h6>
+        <a href="{% url 'pdfs:pdf_list' %}">All PDFs</a>
+        <a href="{% url 'pdfs:pdf_list' %}?pricing=free">Free PDFs</a>
+        <a href="{% url 'pdfs:pdf_list' %}?pricing=premium">Premium PDFs</a>
+        <a href="{% url 'core:pricing' %}">Pricing</a>
+      </div>
+      <div class="col-6 col-md-3">
+        <h6>Company</h6>
+        <a href="{% url 'core:about' %}">About Us</a>
+        <a href="{% url 'core:faq' %}">FAQ</a>
+        <a href="{% url 'core:contact' %}">Contact</a>
+      </div>
+      <div class="col-6 col-md-3">
+        <h6>Legal</h6>
+        <a href="{% url 'core:privacy_policy' %}">Privacy Policy</a>
+        <a href="{% url 'core:terms' %}">Terms &amp; Conditions</a>
+        <a href="{% url 'core:refund_policy' %}">Refund Policy</a>
+        <a href="{% url 'core:shipping_policy' %}">Delivery Policy</a>
+        <a href="{% url 'core:disclaimer' %}">Disclaimer</a>
+        <a href="{% url 'core:cookie_policy' %}">Cookie Policy</a>
+        <a href="{% url 'core:copyright_policy' %}">Copyright Policy</a>
+      </div>
+    </div>
+    <hr class="divider-glow my-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+      <small class="text-muted">&copy; 2026 CodeIQ. All Rights Reserved.</small>
+      <small class="text-muted">Made for developers preparing for their next big interview.</small>
+    </div>
+  </div>
+</footer>
+
+<button id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

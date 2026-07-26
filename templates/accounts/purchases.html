@@ -1,0 +1,19 @@
+{% extends "accounts/_dashboard_base.html" %}
+{% block title %}Purchases — {{ SITE_NAME }}{% endblock %}
+{% block dashboard_content %}
+<h2 class="mb-4">Purchased PDFs</h2>
+<div class="row g-4">
+  {% for order in orders %}
+  <div class="col-6 col-md-4">
+    {% with pdf=order.pdf %}{% include "partials/pdf_card.html" %}{% endwith %}
+  </div>
+  {% empty %}
+  <div class="col-12 text-center py-5">
+    <i class="fa-solid fa-bag-shopping fs-1 text-muted mb-3"></i>
+    <p class="text-muted">You haven't purchased any PDFs yet.</p>
+    <a href="{% url 'pdfs:pdf_list' %}?pricing=premium" class="btn-ciq-primary">Browse Premium PDFs</a>
+  </div>
+  {% endfor %}
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

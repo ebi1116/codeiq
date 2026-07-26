@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="hero-badge hero-anim"><i class="fa-solid fa-bolt text-warning"></i> 1,000+ curated interview PDFs</span>
+        <h1 class="mt-3 hero-anim">Walk into your next interview <span class="text-gradient">already prepared</span></h1>
+        <p class="lead mt-3 hero-anim">Search, preview and download interview question PDFs — organized by technology, company and experience level. Free and premium, ready when you are.</p>
+
+        <form action="{% url 'core:search' %}" method="get" class="search-shell mt-4 hero-anim">
+          <i class="fa-solid fa-magnifying-glass text-muted"></i>
+          <input type="text" name="q" placeholder="Search Django, Amazon, React, HR questions...">
+          <button type="submit" class="btn-ciq-primary">Search</button>
+        </form>
+
+        <div class="d-flex gap-4 mt-4 hero-anim flex-wrap">
+          <a href="{% url 'pdfs:pdf_list' %}?pricing=free" class="btn-ciq-outline"><i class="fa-solid fa-gift me-2"></i>Browse Free PDFs</a>
+          <a href="{% url 'pdfs:pdf_list' %}" class="btn-ciq-outline">Explore All PDFs <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="hero-terminal hero-anim">
+          <div class="term-bar">
+            <span class="term-dot" style="background:#FF5F56;"></span>
+            <span class="term-dot" style="background:#FFBD2E;"></span>
+            <span class="term-dot" style="background:#27C93F;"></span>
+            <span class="ms-2 text-muted small">interview_prep.py</span>
+          </div>
+          <pre><span class="cmt"># Today's prep session</span>
+<span class="kw">class</span> <span class="fn">Candidate</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.status = <span class="str">"almost ready"</span>
+        self.pdfs_downloaded = 0
+
+    <span class="kw">def</span> <span class="fn">prepare</span>(self, topic):
+        pdf = CodeIQ.find(topic)
+        self.pdfs_downloaded += 1
+        <span class="kw">return</span> pdf.download()
+
+<span class="cmt"># >>> candidate.prepare("Django")</span>
+<span class="cmt"># ✓ 120 questions downloaded</span>
+<span class="cmt"># ✓ Confidence: rising 📈</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="container">
+  <div class="glass row g-0 py-2 px-2">
+    <div class="col-6 col-md-3 stat-pill"><div class="num">{{ stats.total_pdfs }}+</div><div class="label">PDFs</div></div>
+    <div class="col-6 col-md-3 stat-pill"><div class="num">{{ stats.total_categories }}+</div><div class="label">Categories</div></div>
+    <div class="col-6 col-md-3 stat-pill"><div class="num">{{ stats.total_companies }}+</div><div class="label">Companies</div></div>
+    <div class="col-6 col-md-3 stat-pill"><div class="num">{{ stats.total_downloads }}+</div><div class="label">Downloads</div></div>
+  </div>
+</section>
+
+<!-- ============ CATEGORIES ============ -->
+<section class="container py-5">
+  <div class="mb-4" data-aos="fade-up">
+    <span class="section-eyebrow">Browse</span>
+    <h2 class="section-title">Popular Categories</h2>
+  </div>
+  <div class="row g-4">
+    {% for cat in categories %}
+    <div class="col-md-6 col-lg-4" data-aos="zoom-in">
+      <div class="glass p-3 h-100">
+        <a href="{{ cat.get_absolute_url }}" class="category-chip text-decoration-none d-flex mb-3">
+          <i class="fa-solid {{ cat.icon|default:'fa-code' }}"></i>
+          <span>{{ cat.name }}</span>
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">Categories will show up here once added in the admin panel.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="container py-5">
+  <div class="text-center mb-5" data-aos="fade-up">
+    <span class="section-eyebrow">Why CodeIQ</span>
+    <h2 class="section-title">Everything you need to prep, in one place</h2>
+  </div>
+  <div class="row g-4">
+    {% for f in "1234"|make_list %}{% endfor %}
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+      <div class="glass p-4 h-100">
+        <i class="fa-solid fa-magnifying-glass-chart fs-3 mb-3" style="color:var(--primary);"></i>
+        <h5>Smart Search</h5>
+        <p class="text-muted small mb-0">Find questions by technology, company, role or keyword in seconds.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+      <div class="glass p-4 h-100">
+        <i class="fa-solid fa-eye fs-3 mb-3" style="color:var(--secondary);"></i>
+        <h5>Free Previews</h5>
+        <p class="text-muted small mb-0">Preview real chapters before you decide to purchase.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+      <div class="glass p-4 h-100">
+        <i class="fa-solid fa-shield-halved fs-3 mb-3" style="color:var(--accent);"></i>
+        <h5>Secure Checkout</h5>
+        <p class="text-muted small mb-0">Razorpay-powered payments with instant, secure downloads.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+      <div class="glass p-4 h-100">
+        <i class="fa-solid fa-infinity fs-3 mb-3" style="color:var(--warning);"></i>
+        <h5>Download Anytime</h5>
+        <p class="text-muted small mb-0">Your purchases live in your dashboard, ready whenever you need them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="container py-5">
+  <div class="text-center mb-5" data-aos="fade-up">
+    <span class="section-eyebrow">Success stories</span>
+    <h2 class="section-title">Trusted by job seekers everywhere</h2>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4" data-aos="fade-up">
+      <div class="testimonial-card glass">
+        <div class="stars mb-2"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="text-muted">"The Django PDF covered exactly what my interviewer asked. Landed the offer within a week."</p>
+        <strong>Arjun M.</strong> <span class="text-muted small">— Backend Developer</span>
+      </div>
+    </div>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+      <div class="testimonial-card glass">
+        <div class="stars mb-2"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="text-muted">"Company-specific questions for Amazon were spot on. Worth every rupee."</p>
+        <strong>Divya K.</strong> <span class="text-muted small">— SDE-1 Candidate</span>
+      </div>
+    </div>
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+      <div class="testimonial-card glass">
+        <div class="stars mb-2"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
+        <p class="text-muted">"Free PDFs alone got me through my first two rounds. Upgraded for the rest."</p>
+        <strong>Rahul S.</strong> <span class="text-muted small">— Fresher</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="container py-5" id="pricing">
+  <div class="text-center mb-5" data-aos="fade-up">
+    <span class="section-eyebrow">Simple pricing</span>
+    <h2 class="section-title">Pay only for what you need</h2>
+  </div>
+  <div class="row g-4 justify-content-center">
+    <div class="col-md-5 col-lg-4" data-aos="fade-up">
+      <div class="pricing-card">
+        <h5>Free PDFs</h5>
+        <div class="my-3"><span class="display-6 fw-bold">₹0</span></div>
+        <p class="text-muted small">Great for getting started with the basics.</p>
+        <ul class="list-unstyled small text-muted d-flex flex-column gap-2 my-4">
+          <li><i class="fa-solid fa-check text-success me-2"></i>Unlimited free downloads</li>
+          <li><i class="fa-solid fa-check text-success me-2"></i>Core topics covered</li>
+          <li><i class="fa-solid fa-check text-success me-2"></i>Google sign-in required</li>
+        </ul>
+        <a href="{% url 'pdfs:pdf_list' %}?pricing=free" class="btn-ciq-outline w-100 text-center d-block">Browse Free PDFs</a>
+      </div>
+    </div>
+    <div class="col-md-5 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+      <div class="pricing-card featured">
+        <span class="badge bg-primary mb-2">Most popular</span>
+        <h5>Premium PDFs</h5>
+        <div class="my-3"><span class="display-6 fw-bold">Pay per PDF</span></div>
+        <p class="text-muted small">In-depth, company-specific and advanced-level question sets.</p>
+        <ul class="list-unstyled small text-muted d-flex flex-column gap-2 my-4">
+          <li><i class="fa-solid fa-check text-success me-2"></i>Everything in Free</li>
+          <li><i class="fa-solid fa-check text-success me-2"></i>Company-specific PDFs</li>
+          <li><i class="fa-solid fa-check text-success me-2"></i>Lifetime access after purchase</li>
+        </ul>
+        <a href="{% url 'pdfs:pdf_list' %}?pricing=premium" class="btn-ciq-primary w-100 text-center d-block">Browse Premium PDFs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="container py-5">
+  <div class="text-center mb-5" data-aos="fade-up">
+    <span class="section-eyebrow">Questions</span>
+    <h2 class="section-title">Frequently asked</h2>
+  </div>
+  <div class="accordion glass" id="homeFaq" data-aos="fade-up">
+    <div class="accordion-item bg-transparent border-bottom">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed bg-transparent text-reset" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">Do I need to sign up with a password?</button>
+      </h2>
+      <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
+        <div class="accordion-body text-muted">No — CodeIQ uses Google sign-in only. Click "Continue with Google" and you're in, no passwords to remember.</div>
+      </div>
+    </div>
+    <div class="accordion-item bg-transparent border-bottom">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed bg-transparent text-reset" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Can I preview a PDF before purchasing?</button>
+      </h2>
+      <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
+        <div class="accordion-body text-muted">Yes, every premium PDF includes a free preview so you know exactly what you're getting.</div>
+      </div>
+    </div>
+    <div class="accordion-item bg-transparent">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed bg-transparent text-reset" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">How do I download a PDF after purchase?</button>
+      </h2>
+      <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#homeFaq">
+        <div class="accordion-body text-muted">Head to your dashboard's "Purchases" tab — every PDF you've bought is available for download anytime.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="container py-5">
+  <div class="glass-strong newsletter-panel p-5 text-center" data-aos="zoom-in">
+    <h3 class="mb-2">Get new interview PDFs in your inbox</h3>
+    <p class="text-muted mb-4">Weekly picks across technologies and companies — no spam, unsubscribe anytime.</p>
+    <form class="d-flex gap-2 justify-content-center flex-wrap" onsubmit="event.preventDefault(); this.querySelector('button').innerHTML='<i class=\'fa-solid fa-check\'></i> Subscribed'; ">
+      <input type="email" required placeholder="you@example.com" class="ciq-input" style="max-width:320px;">
+      <button type="submit" class="btn-ciq-primary">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

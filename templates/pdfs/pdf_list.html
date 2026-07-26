@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}All Interview PDFs — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="container py-5">
+  <div class="mb-4" data-aos="fade-up">
+    <span class="section-eyebrow">Library</span>
+    <h1 class="section-title">All Interview PDFs</h1>
+  </div>
+
+  <form method="get" class="d-flex flex-wrap gap-2 mb-4" data-aos="fade-up">
+    <select name="pricing" class="ciq-select w-auto" onchange="this.form.submit()">
+      <option value="">All Pricing</option>
+      <option value="free" {% if request.GET.pricing == "free" %}selected{% endif %}>Free</option>
+      <option value="premium" {% if request.GET.pricing == "premium" %}selected{% endif %}>Premium</option>
+    </select>
+    <select name="sort" class="ciq-select w-auto" onchange="this.form.submit()">
+      <option value="latest" {% if request.GET.sort == "latest" or not request.GET.sort %}selected{% endif %}>Latest</option>
+      <option value="popular" {% if request.GET.sort == "popular" %}selected{% endif %}>Most Downloaded</option>
+      <option value="trending" {% if request.GET.sort == "trending" %}selected{% endif %}>Trending</option>
+    </select>
+  </form>
+
+  <div class="row g-4">
+    {% for pdf in pdfs %}
+    <div class="col-6 col-md-4 col-lg-3">{% include "partials/pdf_card.html" %}</div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <i class="fa-solid fa-folder-open fs-1 text-muted mb-3"></i>
+      <p class="text-muted">No PDFs match these filters yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-3">
+      <div class="dash-sidebar glass" data-aos="fade-right">
+        <div class="d-flex align-items-center gap-3 mb-4 px-2">
+          <span class="rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-weight:700;font-size:1.2rem;">
+            {{ user.first_name|default:user.username|first|upper }}
+          </span>
+          <div>
+            <div class="fw-semibold">{{ user.first_name|default:user.username }}</div>
+            <div class="text-muted small">{{ user.email }}</div>
+          </div>
+        </div>
+        <a href="{% url 'accounts:dashboard' %}" class="dash-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fa-solid fa-gauge"></i>Overview</a>
+        <a href="{% url 'accounts:purchases' %}" class="dash-link {% if request.resolver_match.url_name == 'purchases' %}active{% endif %}"><i class="fa-solid fa-bag-shopping"></i>Purchases</a>
+        <a href="{% url 'accounts:free_downloads' %}" class="dash-link {% if request.resolver_match.url_name == 'free_downloads' %}active{% endif %}"><i class="fa-solid fa-gift"></i>Free Downloads</a>
+        <a href="{% url 'accounts:recently_viewed' %}" class="dash-link {% if request.resolver_match.url_name == 'recently_viewed' %}active{% endif %}"><i class="fa-solid fa-clock-rotate-left"></i>Recently Viewed</a>
+        <a href="{% url 'accounts:wishlist' %}" class="dash-link {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}"><i class="fa-solid fa-heart"></i>Wishlist</a>
+        <a href="{% url 'accounts:bookmarks' %}" class="dash-link {% if request.resolver_match.url_name == 'bookmarks' %}active{% endif %}"><i class="fa-solid fa-bookmark"></i>Bookmarks</a>
+        <a href="{% url 'accounts:invoices' %}" class="dash-link {% if request.resolver_match.url_name == 'invoices' %}active{% endif %}"><i class="fa-solid fa-file-invoice"></i>Invoices</a>
+        <a href="{% url 'accounts:settings' %}" class="dash-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"><i class="fa-solid fa-gear"></i>Settings</a>
+        <hr class="divider-glow my-2">
+        <a href="{% url 'account_logout' %}" class="dash-link"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+      </div>
+    </div>
+    <div class="col-lg-9" data-aos="fade-up">
+      {% block dashboard_content %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}
